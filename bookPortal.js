@@ -112,44 +112,36 @@ while(choice){
     }
 }
 
+// 2nd task :-
 
-// *** After each task you have to commit that code with commit msg as task no 
-
-// 1st task :-
-
-// show available books to users --> 
-// 	here you have to show all list items
+// show available books :-
+// 	here after each operation whenever user want to see available books..show them list with latest quantity...once quantity reaches 0 change status to unavailable	
 
 function showAvailableBooks(){
     console.table(bookStore,["Book_ID","Name","Price","Status","Quantity"]);
 }
 	
-// add book --> 
-// 	here you have to take i/p from user to add book in cart --> 
-//  that i/p can be index no of book from that list --> 
-//  for this you have to maintain one list as cart & you have to add this book in that list --> 
-//  while adding that book in list you have to pass Quantity as 1 
-// 	-- once you add that book cart you have to update the Quantity in book list
-//  -- like you have to decrease the Quantity by one & update the same in list 
-
-
+// add book -->
+// 	now you have to ask quantity as well...& pass that quantity to cart list with book details & update booklists entry quantity accordingly	
+	
 function addBook(){
-    let userInput = readLine.questionInt("enter the book id: ");
+    let userInput = readLine.questionInt("enter the book id: \n");
+    let bookQuantity = readLine.questionInt("enter the quantity: \n");
     //checking if the book id is already present or not from bookStore
     
     for(let obj of bookStore){
-        console.log(obj);
         let book = {};
-        console.log(cart.length);
         if(cart.length > 0 && obj.Book_ID == userInput){
             //checking whether the book is already present in cart or not
             for(let bookInCart of cart){
-                console.log("book in cart obj",bookInCart);
                 if(bookInCart.Book_ID == userInput){
-                    console.log("book is already present in cart.So, increasing the quantity");
-                    bookInCart.Quantity++;
-                    console.log("after quantity increase",bookInCart);   // if book is present increasing the quantity.
-                    // obj.Quantity--;
+                    if(obj.Quantity>0){
+                        console.log("\nbook is already present in cart.So, increasing the quantity\n");
+                        bookInCart.Quantity = bookQuantity;   // if book is present increasing the quantity.
+                    }else{
+                        console.log("\nbook is out of stock\n");
+                        obj.Status = "unavailable";
+                    }   
                     break;             
                 }
                 else{                                  // if not present then checking whether the user entered book id is matching with any book id in book store
@@ -158,8 +150,9 @@ function addBook(){
                         book.Book_ID = obj.Book_ID;
                         book.Price = obj.Price;
                         book.Status = obj.Status;
-                        book.Quantity = 1;
+                        book.Quantity = bookQuantity;
                         cart.push(book);
+                        console.log("\nbook is added to cart\n");
                         break;
                     }
                     else{
@@ -168,7 +161,13 @@ function addBook(){
                     }
                 }
             } 
-            obj.Quantity--;
+            if(obj.Quantity > 0){
+                obj.Quantity = obj.Quantity - bookQuantity;
+            }else{
+                if(obj.Quantity == 0){
+                    obj.Status = "unavailable";
+                }
+            }
             break;
         }
         else if(cart.length == 0){
@@ -177,23 +176,34 @@ function addBook(){
                 book.Book_ID = obj.Book_ID;
                 book.Price = obj.Price;
                 book.Status = obj.Status;
-                book.Quantity = 1;
+                book.Quantity = bookQuantity;
                 cart.push(book);
+                console.log("\nbook is added to cart\n");
             }else{
                 continue;
             }
-            obj.Quantity--;
+            obj.Quantity = obj.Quantity - bookQuantity;
             break;
         } 
     };
-    console.log(cart);
-    console.table(bookStore,["Book_ID","Name","Price","Status","Quantity"]);
     
 }
 	
 // show cart -->
-// 	here you just have to show the cart list which you are creating while adding book	
+// 	here now you have to calculate price of book according to quantity of each book & also calculate total cart value & display book name, price, quantity, total price & at last line total cart value
+
 
 function showCart(){
-    console.table(cart,["Name","Book_ID","Price","Status","Quantity"]);
+    let totalCartValue = 0;
+    let totalBookvalue = 0;
+    
+    cart.forEach((book)=>{
+        totalBookvalue = book.Price * book.Quantity;
+        book.eachBookPrice = totalBookvalue;
+        totalCartValue += book.eachBookPrice;
+    })
+
+    console.table(cart,["Name","Book_ID","Price","Quantity","eachBookPrice"]);
+    console.log(`\nTotal cart value is ${totalCartValue}\n`);
 }
+
