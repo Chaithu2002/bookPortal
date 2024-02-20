@@ -127,6 +127,8 @@ function showAvailableBooks(){
 function addBook(){
     let userInput = readLine.questionInt("enter the book id: \n");
     let bookQuantity = readLine.questionInt("enter the quantity: \n");
+    //checking whether the quantity is available or not
+
     //checking if the book id is already present or not from bookStore
     
     for(let obj of bookStore){
@@ -176,6 +178,10 @@ function addBook(){
                 book.Book_ID = obj.Book_ID;
                 book.Price = obj.Price;
                 book.Status = obj.Status;
+                if(bookQuantity > obj.Quantity){
+                    console.log(`sorry you cannot add the books, because available quantity is only ${obj.Quantity}`); // checking whether the inserting book quantity is greater than original book quantity.
+                    break;
+                }
                 book.Quantity = bookQuantity;
                 cart.push(book);
                 console.log("\nbook is added to cart\n");
