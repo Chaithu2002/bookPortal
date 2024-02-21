@@ -112,18 +112,14 @@ while(choice){
     }
 }
 
-// 2nd task :-
+// 4th task :-
 
-// show available books :-
-// 	here after each operation whenever user want to see available books..show them list with latest quantity...once quantity reaches 0 change status to unavailable	
+// to display available books only
 
 function showAvailableBooks(){
-    console.table(bookStore,["Book_ID","Name","Price","Status","Quantity"]);
+    console.table(bookStore.filter((book)=> book.Status == "available"),["Book_ID","Name","Price","Status","Quantity"])   //filtering the books which are available in book store and consoling them 
 }
-	
-// add book -->
-// 	now you have to ask quantity as well...& pass that quantity to cart list with book details & update booklists entry quantity accordingly	
-	
+
 function addBook(){
     let userInput = readLine.questionInt("enter the book id: \n");
     let bookQuantity = readLine.questionInt("enter the quantity: \n");
@@ -189,15 +185,15 @@ function addBook(){
                 continue;
             }
             obj.Quantity = obj.Quantity - bookQuantity;
+            if(obj.Quantity == 0){
+                obj.Status = "unavailable";                //if book quantity becomes 0 after pushing into cart then making the status of the book to unavailable
+            }
             break;
         } 
     };
     
 }
 	
-// show cart -->
-// 	here now you have to calculate price of book according to quantity of each book & also calculate total cart value & display book name, price, quantity, total price & at last line total cart value
-
 
 function showCart(){
     let totalCartValue = 0;
@@ -212,4 +208,5 @@ function showCart(){
     console.table(cart,["Name","Book_ID","Price","Quantity","eachBookPrice"]);
     console.log(`\nTotal cart value is ${totalCartValue}\n`);
 }
+
 
