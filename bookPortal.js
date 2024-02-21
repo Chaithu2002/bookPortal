@@ -96,7 +96,7 @@ let cart = [];
 
 let choice = true;
 while(choice){
-    let input = readLine.questionInt("Pick one option from the below operations:\n1. view available books\n2. add book\n3. show cart\n4. exit\nenter your choice: ");
+    let input = readLine.questionInt("Pick one option from the below operations:\n1. view available books\n2. add book to cart\n3. show cart\n4. Update cart\n5. exit\nenter your choice: ");
     if(input == 1){
         showAvailableBooks();
     }
@@ -107,21 +107,20 @@ while(choice){
         showCart();
     }
     if(input == 4){
+        updateCart();
+    }
+    if(input == 5){
         console.log("\nThankyou for visiting Book Portal :)\n");
         choice = false;
     }
 }
-
-// 4th task :-
-
-// to display available books only
 
 function showAvailableBooks(){
     console.table(bookStore.filter((book)=> book.Status == "available"),["Book_ID","Name","Price","Status","Quantity"])   //filtering the books which are available in book store and consoling them 
 }
 
 function addBook(){
-    let userInput = readLine.questionInt("enter the book id: \n");
+    let userInput = readLine.questionInt(`enter the book id between ${bookStore[0].Book_ID} and ${bookStore[bookStore.length-1].Book_ID}: \n`);
     let bookQuantity = readLine.questionInt("enter the quantity: \n");
     //checking whether the quantity is available or not
 
@@ -194,8 +193,13 @@ function addBook(){
     
 }
 	
-
 function showCart(){
+    //if user enteres show cart at first i.t option 3
+    if(cart.length == 0){
+        console.log("cart is empty, add items first\n");
+        return;
+    }
+    // if cart.length is above 0 then below code follows
     let totalCartValue = 0;
     let totalBookvalue = 0;
     
@@ -208,5 +212,131 @@ function showCart(){
     console.table(cart,["Name","Book_ID","Price","Quantity","eachBookPrice"]);
     console.log(`\nTotal cart value is ${totalCartValue}\n`);
 }
+
+// 5th Task:-
+
+// remove item -> Ask for ID, Remove that item from the cart, update the cart and total cart value. after that add to booklist.
+// update item -> Ask for ID, Then ask for updated quantity, update the book list cart with the updated quantity
+function updateCart(){
+    console.log("1. Remove Item\n2. Update Item\n");
+    let userInput = readLine.questionInt("enter your choice: ");
+    if(userInput == 1){
+        removeItem();
+    }
+    else if(userInput == 2){
+        updateQuantity();
+    }
+}
+
+//removing item from the cart and updating quantity in bookStore 
+function removeItem(){
+
+    //taking input bookID from user
+    let userBookID = readLine.questionInt("enter the book ID: ");
+    let removedQuantity = 0;
+
+    //searching for userbookId in cart if yes removing the book from cart
+    let last = 0;
+    for(let book of cart){
+        
+        if(book.Book_ID == userBookID){
+            console.log("1. remove entire book\n2. some quantity from book\n");
+            let input = readLine.questionInt("enter you choice: ");
+            if(input == 1){
+                removedQuantity = book.Quantity;
+                let bookIndex = cart.indexOf(book);
+                cart.splice(bookIndex,1);
+                console.log("book is removed from cart\n");
+            }
+            if(input == 2){
+                let inputQuantity = readLine.questionInt("enter how much quantity to remove: ");
+                book.Quantity = book.Quantity - inputQuantity;
+                removedQuantity = inputQuantity
+                console.log(`${inputQuantity} quantity of book ${userBookID}ID is removed from cart\n`);
+            }
+            break;
+        }
+        if(last == cart.length){
+            console.log("enter the valid bookID number: ");
+            removeItem();
+        }
+        last++;
+    }
+
+    // going through each book in book store and checking if the userbookID is matching with book ID in book store if yes then increasing the removed quantity 
+    for(let obj of bookStore){
+        if(obj.Book_ID == userBookID){
+            if(obj.Quantity == 0){              //checking if the book quantity in bookStore is 0 or not
+                obj.Status = "available";
+                obj.Quantity = obj.Quantity + removedQuantity;
+            }
+            else{
+                obj.Quantity = obj.Quantity + removedQuantity;
+            }
+            break;
+        }
+    };
+}
+
+//updating item with required quantity 
+function updateQuantity(){
+
+    //if user directly updates the cart we need to check the cart length
+    if(cart.length == 0){
+        console.log("cart is empty, please add items to cart first\n");
+        return;
+    }
+
+    //if cart length is above 0 the below code follows
+    let userBookID = readLine.questionInt("enter the book ID: ");
+
+    
+    // let last = 0;
+    for(let obj of bookStore){
+        if(obj.Book_ID == userBookID){
+            let last = 1;
+            for(let book of cart){
+                if(book.Book_ID == userBookID){
+                    if(obj.Status == "available"){
+                        console.log(`available only ${obj.Quantity} quantites`);
+                        let choice = true;
+                        while(choice){
+                            let extraQuantity = readLine.questionInt("enter the quantity to update: ");
+                            if(extraQuantity > obj.Quantity){
+                                console.log("you are trying to add above available quantity, please add within the quantity\n");
+                                continue;
+                            }
+                            for(let book of cart){
+                                if(book.Book_ID == userBookID){
+                                    book.Quantity = book.Quantity + extraQuantity;      //adding quantity to the required book
+                                    console.log("book quantity is updated please check your cart\n");
+                                    break;
+                                }
+                            }
+                            obj.Quantity = obj.Quantity - extraQuantity;      //decresing the book quantity in book store after updating in cart
+                            choice = false;
+                        }
+                    }else{
+                        console.log("Book is out of stock.So, No quantity available\n");
+                    }
+                    break;
+                }
+
+                if(last==cart.length){
+                    console.log("bookID is not present in cart, please add book into cart\n");
+                    return;
+                }
+                else{
+                    last++;
+                }
+            }
+            break;
+
+        }
+
+    }
+    
+}
+
 
 
